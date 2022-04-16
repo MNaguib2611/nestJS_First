@@ -1,0 +1,10 @@
+{
+  "db":
+  {
+  "synchronize": false
+  },
+    
+  "jwt":{
+  "secret": "topSecret51"    
+  }
+}
