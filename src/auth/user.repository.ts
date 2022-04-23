@@ -7,19 +7,20 @@ import { User } from "./user.entity";
 export class UserRepository extends Repository<User> {
    async signup(authCredentialsDto: AuthCredentialsDto): Promise<void>{
     const {username, password} =  authCredentialsDto; 
-    const salt =await bcrypt.genSalt();
-    const user = new User();
-    user.salt=salt;
+    // const salt =await bcrypt.genSalt();
+    
+    // const user = new User();
+    const user = this.create();
+    user.salt=await bcrypt.genSalt();;
     user.username=username;
-    user.password= await this.hashPassword(password,salt);
+    user.password= await this.hashPassword(password,user.salt);
     try {
         await user.save();  
     } catch (error) {
-        switch (error.code) {
-            case "23505":
-              throw new ConflictException('User already exists');
-            default:
-                throw new InternalServerErrorException("Something went Wrong");
+        if (error.code === "23505") {
+            throw new ConflictException('User already exists');
+        }else{
+            throw new InternalServerErrorException("Something went Wrong");
         }
     }    
    }
@@ -32,7 +33,7 @@ export class UserRepository extends Repository<User> {
    async signin(authCredentialsDto: AuthCredentialsDto): Promise<string>{
         const {username, password} =  authCredentialsDto; 
         const user = await this.findOne({username});
-        if (user && user.validatePassword(password)) {
+        if (user && await user.validatePassword(password)) {
             return user.username;
         }
         return null;
