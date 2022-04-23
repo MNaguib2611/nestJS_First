@@ -12,7 +12,7 @@ describe('JwtStrategy', () => {
     let jwtStrategy: JwtStrategy;
     let userRepository;
 
-    beforeEach(async () => {
+    beforeEach(async() => {
         const module =  await Test.createTestingModule({
             providers: [
                 JwtStrategy,
@@ -33,9 +33,9 @@ describe('JwtStrategy', () => {
             expect( result).toEqual(user);
         });
 
-        // it('returns unauthorized exception as user can not be found',async () => {
-        //     userRepository.findOne.mockResolvedValue(null);
-        //     await expect(jwtStrategy.validate({username:'TestUser'})).rejects.toThrow(UnauthorizedException);
-        // });
+        it('returns unauthorized exception as user can not be found',async () => {
+            userRepository.findOne.mockResolvedValue(null);
+            await expect(jwtStrategy.validate({username:'TestUser'})).rejects.toThrow(UnauthorizedException);
+        });
     });
 });
